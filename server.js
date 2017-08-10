@@ -26,6 +26,6 @@ function handleRequest(req, res) {
 
 var server = http.createServer(handleRequest);
 
-server.listen(8081, function() {
-    console.log('listening for http on port 8081');
+server.listen(80, function() {
+    console.log('listening on http://192.168.3.1');
 });
