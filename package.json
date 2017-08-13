@@ -1,0 +1,29 @@
+{
+  "name": "tank-from-earth",
+  "version": "1.0.0",
+  "description": "Tank controlled by mobile device orientation via its own WIFI AP node server running on an Onion Omega2.",
+  "main": "motor-test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/entozoon/tank-from-earth.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/entozoon/tank-from-earth/issues"
+  },
+  "homepage": "https://github.com/entozoon/tank-from-earth#readme",
+  "dependencies": {
+    "omega2-gpio": "^1.0.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-eslint": "^7.2.3",
+    "babel-preset-es2015": "^6.24.1",
+    "eslint": "^4.2.0"
+  }
+}
