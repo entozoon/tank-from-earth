@@ -4,7 +4,7 @@
   "description": "Tank controlled by mobile device orientation via its own WIFI AP node server running on an Onion Omega2.",
   "main": "motor-test.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node tests/socket-test && node tests/motor-test",
     "start": "node server.js"
   },
   "repository": {

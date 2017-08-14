@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html><body>
+<a href="#" id="click">Click</a>
+<script>
+console.log('Connecting..');
+
+// If this IP is unpredictable, I might send it through from the server - plus it'd be localhost testable then
+var connection = new WebSocket('ws://127.0.0.1:8080');
+
+connection.onopen = function() {
+  console.log('Connected');
+
+  connection.onerror = function(error) {
+    console.log('Error: ' + error);
+  };
+
+  connection.onmessage = function(message) {
+    console.log(message.data);
+  };
+
+  connection.send('Hello from client!');
+
+  document.getElementById('click').addEventListener('click', function() {
+    connection.send('Click!');
+  });
+};
+</script>
+</body></html>

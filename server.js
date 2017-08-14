@@ -1,31 +1,34 @@
-var http = require('http');
-var fs = require('fs');
+let http = require('http'),
+  fs = require('fs'),
+  port = 80;
 
-var ledFle = '/sys/class/leds/onion:amber:system/brightness';
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 8080 });
 
-function led(onOff) {
-  fs.writeFile(ledFle, onOff, function(err) {
-    if (err) {
-      return console.log(err);
-    }
+fs.readFile('./public/client.html', function(err, html) {
+  if (err) {
+    throw err;
+  }
+
+  // Net server (or http would be fine) to serve the page
+  http
+    .createServer(function(request, response) {
+      console.log('User connected');
+
+      response.writeHead(200, { 'Content-Type': 'text/html' });
+      response.write(html);
+      response.end();
+    })
+    .listen(port);
+  console.log('Listening on http://192.168.3.1:' + port);
+
+  // WebSocket server for sockets
+  wss.on('connection', function connection(ws) {
+    console.log('Client connected');
+    ws.on('message', function incoming(message) {
+      console.log(message);
+    });
+
+    ws.send('Hello from server!');
   });
-}
-
-function handleRequest(req, res) {
-  if (req.url == '/ledon') {
-    led(1);
-  }
-  if (req.url == '/ledoff') {
-    led(0);
-  }
-  res.writeHead(200, { 'Content-Type': 'text/html' });
-  res.write('<h1>LED SWITCH</h1>');
-  res.write('<a href="/ledon">[ON]</a> | <a href="/ledoff">[OFF]</a> ');
-  res.end();
-}
-
-var server = http.createServer(handleRequest);
-
-server.listen(80, function() {
-  console.log('listening on http://192.168.3.1');
 });
