@@ -1,0 +1,11 @@
+be-brutal-with-these
+.ftpconfig
+.ftpignore
+id_rsa
+.DS_Store
+.git
+README.md
+package-lock.json
+package.json
+node_modules
+!node_modules/ws
