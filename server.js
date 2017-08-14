@@ -24,7 +24,6 @@ fs.readFile('./public/client.html', function(err, html) {
 
   // WebSocket server for sockets
   wss.on('connection', function connection(ws) {
-    console.log('Client connected');
     ws.on('message', function incoming(message) {
       console.log(message);
     });
