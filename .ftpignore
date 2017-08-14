@@ -1,11 +1,10 @@
-be-brutal-with-these
 .ftpconfig
 .ftpignore
-id_rsa
-.DS_Store
 .git
-README.md
+.editorconfig
+.eslintrc
+.gitignore
 package-lock.json
 package.json
-node_modules
-!node_modules/ws
+README.md
+/be-brutal-with-these-although-it-cant-handle-nots-seemingly-despite-docs
