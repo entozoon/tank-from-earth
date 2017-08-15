@@ -1,5 +1,8 @@
 <!DOCTYPE HTML>
 <html>
+<head>
+<link rel="manifest" href="/manifest.json" />
+<meta name="mobile-web-app-capable" content="yes">
 <style>
 table {
   width: 100%;
@@ -33,7 +36,9 @@ td:first-child {
   background: #c0ffee;
 }
 </style>
+</head>
 <body>
+<div id="fullscreen">FULLSCREEN</div>
 <a href="#" id="click">Click</a>
 <table>
 <tr><td>alpha:</td><td><div id="alpha" class="bar"></div></td></tr>
@@ -48,8 +53,64 @@ td:first-child {
 <div id="blob2dx"></div>
 <div id="blob2dy"></div>
 </div>
+<style>
+* { box-sizing: border-box; }
+
+#tank {
+  position: relative;
+  margin: 200px;
+  width: 100px;
+  height: 200px;
+  border: 1px solid black;
+}
+#direction {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: 50%;
+  left: 50%;
+  border-radius: 5px;
+  background: #faa;
+}
+</style>
+<div id="tank">
+  <div id="direction"></div>
+</div>
 
 <script>
+function toggleFullScreen() {
+  var doc = window.document;
+  var docEl = doc.documentElement;
+
+  var requestFullScreen =
+    docEl.requestFullscreen ||
+    docEl.mozRequestFullScreen ||
+    docEl.webkitRequestFullScreen ||
+    docEl.msRequestFullscreen;
+  var cancelFullScreen =
+    doc.exitFullscreen ||
+    doc.mozCancelFullScreen ||
+    doc.webkitExitFullscreen ||
+    doc.msExitFullscreen;
+
+  if (
+    !doc.fullscreenElement &&
+    !doc.mozFullScreenElement &&
+    !doc.webkitFullscreenElement &&
+    !doc.msFullscreenElement
+  ) {
+    requestFullScreen.call(docEl);
+    screen.orientation.lock('landscape');
+    window.screen.lockOrientation('portrait-primary', 'landscape-primary');
+  } else {
+    cancelFullScreen.call(doc);
+  }
+}
+
+document.getElementById('fullscreen').addEventListener('click', () => {
+  toggleFullScreen();
+});
+
 console.log('Connecting..');
 
 // If this IP is unpredictable, I might send it through from the server - plus it'd be localhost testable then
@@ -99,15 +160,15 @@ class Orientator {
         this.beta = event.beta;
         this.gamma = event.gamma;
 
-        document.getElementById('alpha').innerHTML = Math.round(this.alpha) + ' °';
-        document.getElementById('beta').innerHTML = Math.round(this.beta) + ' °';
-        document.getElementById('gamma').innerHTML = Math.round(this.gamma) + ' °';
+        document.getElementById('alpha').innerHTML = Math.round(this.alpha) + ' &deg;';
+        document.getElementById('beta').innerHTML = Math.round(this.beta) + ' &deg;';
+        document.getElementById('gamma').innerHTML = Math.round(this.gamma) + ' &deg;';
         document.getElementById('alpha').style.width = this.alpha + 360 + 'px';
         document.getElementById('beta').style.width = this.beta + 360 + 'px';
         document.getElementById('gamma').style.width = this.gamma + 360 + 'px';
 
         document.getElementById('needle').style.transform =
-          'rotate(' + (this.beta / 1.5 + this.gamma) + 'deg) translateZ(0)';
+          'rotate(' + -(this.beta + 90) + 'deg) translateZ(0)';
 
         let blob1 = { x: 300, y: 0 },
           blob2 = {};
@@ -123,6 +184,10 @@ class Orientator {
 
         document.getElementById('blob2dx').innerHTML = Math.round(blob2.x) + 'px';
         document.getElementById('blob2dy').innerHTML = Math.round(blob2.y) + 'px';
+
+        document.getElementById('direction').style.transform =
+          'rotate(' + -(this.beta + 90) + 'deg) translateZ(0)';
+        document.getElementById('direction').style.height = this.gamma + 'px';
       },
       false
     );
@@ -142,7 +207,7 @@ class Orientator {
         {
           name: 'rotationRate',
           event: event.rotationRate,
-          unit: ' °/s'
+          unit: ' &deg;/s'
         }
       ].forEach(motion => {
         // e.g. x, y, z, alpha, beta, gamma

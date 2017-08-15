@@ -1,6 +1,6 @@
 {
   "name": "tank-from-earth",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Tank controlled by mobile device orientation via its own WIFI AP node server running on an Onion Omega2.",
   "main": "motor-test.js",
   "scripts": {
