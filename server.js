@@ -20,22 +20,35 @@ let readFilePromise = filename => {
 
 Promise.all([
   readFilePromise('./public/client.html'),
-  readFilePromise('./public/manifest.json')
+  readFilePromise('./public/manifest.json'),
+  readFilePromise('./public/app.css'),
+  readFilePromise('./public/app.js')
 ]).then(resolutions => {
   let client = resolutions[0],
-    manifest = resolutions[1];
+    manifest = resolutions[1],
+    css = resolutions[2],
+    js = resolutions[3];
   // Net server (or http would be fine) to serve the page
   http
     .createServer(function(request, response) {
       console.log('User connected');
 
-      if (request.url == '/manifest.json') {
-        console.log(manifest);
-        response.write(manifest.toString());
-      } else {
-        response.writeHead(200, { 'Content-Type': 'text/html' });
-        response.write(client.toString());
+      switch (request.url) {
+        case '/manifest.json':
+          response.write(manifest.toString());
+          break;
+        case '/app.css':
+          response.write(css.toString());
+          break;
+        case '/app.js':
+          response.write(js.toString());
+          break;
+        default:
+          response.writeHead(200, { 'Content-Type': 'text/html' });
+          response.write(client.toString());
+          break;
       }
+
       response.end();
     })
     .listen(port);

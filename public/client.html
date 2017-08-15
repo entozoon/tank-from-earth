@@ -1,227 +1,45 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<link rel="manifest" href="/manifest.json" />
-<meta name="mobile-web-app-capable" content="yes">
-<style>
-table {
-  width: 100%;
-}
-.bar {
-  background: blue;
-  min-height: 50px;
-  overflow: visible;
-  color: white;
-}
-td {
-  background: grey;
-}
-td:first-child {
-  width: 10%;
-}
-#needle {
-  margin: 200px;
-  width: 300px;
-  height: 10px;
-  background: #faa;
-}
-#blob1,#blob2 {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #0cf;
-}
-#blob2 {
-  background: #c0ffee;
-}
-</style>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" type="text/css" href="/app.css" />
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-<div id="fullscreen">FULLSCREEN</div>
-<a href="#" id="click">Click</a>
-<table>
-<tr><td>alpha:</td><td><div id="alpha" class="bar"></div></td></tr>
-<tr><td>beta:</td><td><div id="beta" class="bar"></div></td></tr>
-<tr><td>gamma:</td><td><div id="gamma" class="bar"></div></td></tr>
-</table>
-<div id="needle"></div>
 
-<div style="position:relative">
-<div id="blob1"></div>
-<div id="blob2"></div>
-<div id="blob2dx"></div>
-<div id="blob2dy"></div>
-</div>
-<style>
-* { box-sizing: border-box; }
-
-#tank {
-  position: relative;
-  margin: 200px;
-  width: 100px;
-  height: 200px;
-  border: 1px solid black;
-}
-#direction {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  top: 50%;
-  left: 50%;
-  border-radius: 5px;
-  background: #faa;
-}
-</style>
-<div id="tank">
-  <div id="direction"></div>
+<div id="splash">
+  <div class="btn">Ready?</div>
 </div>
 
-<script>
-function toggleFullScreen() {
-  var doc = window.document;
-  var docEl = doc.documentElement;
+<main class="content">
+  <div id="car">
+    <div id="wheel"></div>
+  </div>
 
-  var requestFullScreen =
-    docEl.requestFullscreen ||
-    docEl.mozRequestFullScreen ||
-    docEl.webkitRequestFullScreen ||
-    docEl.msRequestFullscreen;
-  var cancelFullScreen =
-    doc.exitFullscreen ||
-    doc.mozCancelFullScreen ||
-    doc.webkitExitFullscreen ||
-    doc.msExitFullscreen;
+  <table>
+    <tr><td>alpha:</td><td><div id="alpha" class="bar"></div></td></tr>
+    <tr><td>beta:</td><td><div id="beta" class="bar"></div></td></tr>
+    <tr><td>gamma:</td><td><div id="gamma" class="bar"></div></td></tr>
+    <tr><td>a1:</td><td><div id="a1" class="bar"></div></td></tr>
+    <tr><td>a2:</td><td><div id="a2" class="bar"></div></td></tr>
+    <tr><td>ro:</td><td><div id="ro" class="bar"></div></td></tr>
+  </table>
 
-  if (
-    !doc.fullscreenElement &&
-    !doc.mozFullScreenElement &&
-    !doc.webkitFullscreenElement &&
-    !doc.msFullscreenElement
-  ) {
-    requestFullScreen.call(docEl);
-    screen.orientation.lock('landscape');
-    window.screen.lockOrientation('portrait-primary', 'landscape-primary');
-  } else {
-    cancelFullScreen.call(doc);
-  }
-}
+  <div id="needle"></div>
 
-document.getElementById('fullscreen').addEventListener('click', () => {
-  toggleFullScreen();
-});
+  <div style="position:relative">
+  <div id="blob1"></div>
+  <div id="blob2"></div>
+  <div id="blob2dx"></div>
+  <div id="blob2dy"></div>
+  </div>
 
-console.log('Connecting..');
+  <div id="tank">
+    <div id="direction"></div>
+  </div>
+</main>
 
-// If this IP is unpredictable, I might send it through from the server - plus it'd be localhost testable then
-let connection = new WebSocket('ws://127.0.0.1:8080');
-
-connection.onopen = () => {
-  console.log('Connected');
-
-  connection.onerror = error => {
-    console.log('Error: ' + error);
-  };
-
-  connection.onmessage = message => {
-    console.log(message.data);
-  };
-
-  connection.send('Hello from client!');
-
-  document.getElementById('click').addEventListener('click', () => {
-    connection.send('Click!');
-  });
-};
-
-class Orientator {
-  constructor() {
-    // LAY FLAT ON TABLE
-    // event.alpha Z - left right spin turn (0 north at top of device)
-    // event.beta  X - front back lift
-    // event.gamma Y - left right lift
-    // See: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Orientation_and_motion_data_explained
-    this.alpha = 0;
-    this.beta = 0;
-    this.gamma = 0;
-
-    if (!window.DeviceOrientationEvent) {
-      return false;
-    }
-
-    window.addEventListener(
-      'deviceorientation',
-      event => {
-        if (event.absolute) {
-          alert('This device uses absolute orientation..');
-          return;
-        }
-        this.alpha = event.alpha;
-        this.beta = event.beta;
-        this.gamma = event.gamma;
-
-        document.getElementById('alpha').innerHTML = Math.round(this.alpha) + ' &deg;';
-        document.getElementById('beta').innerHTML = Math.round(this.beta) + ' &deg;';
-        document.getElementById('gamma').innerHTML = Math.round(this.gamma) + ' &deg;';
-        document.getElementById('alpha').style.width = this.alpha + 360 + 'px';
-        document.getElementById('beta').style.width = this.beta + 360 + 'px';
-        document.getElementById('gamma').style.width = this.gamma + 360 + 'px';
-
-        document.getElementById('needle').style.transform =
-          'rotate(' + -(this.beta + 90) + 'deg) translateZ(0)';
-
-        let blob1 = { x: 300, y: 0 },
-          blob2 = {};
-        blob2.x = blob1.x + -this.gamma / 90 * 100;
-        blob2.y = blob1.y + (-this.beta + 20) / 90 * 100;
-        // I don't think there is anything clever here. just mixing gamma and beta well.
-        // Try and get an angle somehow, draw it over the top like a compass
-
-        document.getElementById('blob1').style.left = Math.round(blob1.x) + 'px';
-        document.getElementById('blob1').style.top = Math.round(blob1.y) + 'px';
-        document.getElementById('blob2').style.left = Math.round(blob2.x) + 'px';
-        document.getElementById('blob2').style.top = Math.round(blob2.y) + 'px';
-
-        document.getElementById('blob2dx').innerHTML = Math.round(blob2.x) + 'px';
-        document.getElementById('blob2dy').innerHTML = Math.round(blob2.y) + 'px';
-
-        document.getElementById('direction').style.transform =
-          'rotate(' + -(this.beta + 90) + 'deg) translateZ(0)';
-        document.getElementById('direction').style.height = this.gamma + 'px';
-      },
-      false
-    );
-
-    window.addEventListener('devicemotion', event => {
-      [
-        {
-          name: 'acceleration',
-          event: event.acceleration,
-          unit: ' '
-        },
-        {
-          name: 'accelerationIncludingGravity',
-          event: event.accelerationIncludingGravity,
-          unit: ' '
-        },
-        {
-          name: 'rotationRate',
-          event: event.rotationRate,
-          unit: ' &deg;/s'
-        }
-      ].forEach(motion => {
-        // e.g. x, y, z, alpha, beta, gamma
-        for (let direction in motion.event) {
-          if (document.getElementById(motion.name + '-' + direction)) {
-            document.getElementById(motion.name + '-' + direction).innerHTML =
-              Math.round(motion.event[direction] * 10) / 10 + motion.unit;
-          }
-        }
-      });
-    });
-  }
-}
-
-const orientator = new Orientator();
-</script>
-</body></html>
+<script type="text/javascript" src="/app.js"></script>
+</body>
+</html>

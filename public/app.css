@@ -1,0 +1,107 @@
+* {
+  box-sizing: border-box;
+}
+body, html {
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
+}
+#splash {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  text-align: center;
+  background: #aac;
+  overflow: hidden;
+  z-index: 9;
+}
+.btn {
+  margin-top: 45vh;
+  display: inline-block;
+  padding: 5px 10px;
+  color: white;
+  background: dodgerblue;
+  border-radius: 2px;
+  cursor: pointer;
+  user-select: none;
+}
+.content {
+  position: relative;
+}
+#car {
+  position: relative;
+  width: 60vw;
+  height: 60vh;
+  margin: 20vh 20vw;
+  background: #ddd;
+  overflow: hidden;
+}
+#wheel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -7vw 0 0 -10vw;
+  width: 20vw;
+  height: 14vw;
+  border-radius: 50% 50% 25% 25%;
+  border: 15px dashed black;
+}
+
+
+
+
+
+
+
+
+table {
+  width: 100%;
+}
+.bar {
+  background: blue;
+  min-height: 50px;
+  overflow: visible;
+  color: white;
+}
+td {
+  background: grey;
+}
+td:first-child {
+  width: 10%;
+}
+#needle {
+  margin: 200px;
+  width: 300px;
+  height: 10px;
+  background: #faa;
+}
+#blob1,#blob2 {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0cf;
+}
+#blob2 {
+  background: #c0ffee;
+}
+
+
+#tank {
+  position: relative;
+  margin: 200px;
+  width: 100px;
+  height: 200px;
+  border: 1px solid black;
+}
+#direction {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: 50%;
+  left: 50%;
+  border-radius: 5px;
+  background: #faa;
+}
