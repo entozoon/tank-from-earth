@@ -23,7 +23,7 @@ connection.onopen = () => {
   connection.send('Hello from client!');
 };
 
-class Orientator {
+class OrientationalThing {
   constructor() {
     // LAY FLAT ON TABLE
     // event.alpha Z - left right spin turn (0 north at top of device)
@@ -90,7 +90,29 @@ class Orientator {
   }
 }
 
-const orientator = new Orientator();
+//const orientator = new OrientationalThing();
+
+//
+// COMPOSITION (better than inheritance)
+//
+const barker = state => {
+  bark: () => console.log(state.motto);
+};
+
+const orientator = state => {
+  return {
+    bark: () => console.log('Woof, I am ' + state.name)
+  };
+};
+
+const interface = () => {
+  let state = {
+    motto: 'hello'
+  };
+  return Object.assign({}, barker(state), orientator(state));
+};
+
+interface.bark();
 
 openFullScreen = () => {
   var doc = window.document;
