@@ -4,14 +4,16 @@
   "description": "Tank controlled by mobile device orientation via its own WIFI AP node server running on an Onion Omega2.",
   "main": "motor-test.js",
   "scripts": {
-    "test": "node tests/socket-test && node tests/motor-test",
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev-ui": "cd public && browser-sync start --server --port 3030 --startPath client.html --files **/*",
+    "dev-server": "opn http://localhost/client.html && node server.js",
+    "test": "node tests/socket-test && node tests/motor-test"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/entozoon/tank-from-earth.git"
   },
-  "author": "",
+  "author": "MichaelCook.tech",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/entozoon/tank-from-earth/issues"

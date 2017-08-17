@@ -2,19 +2,39 @@
 
 Tank controlled by mobile device orientation via its own WIFI AP node server running on an Onion Omega2.
 
+# Dev Locally
+Install these packages globally (_not_ into node_modules) so they don't FTP themselves to the device.
+    npm i -g browser-sync opn-cli
+
+## Only the UI, not server:
+
+    npm run dev-ui
+
+## Server and UI (no browser sync though)
+
+    npm run dev-server
+
+## Server only
+
+    npm start
+
 ## Setup Omega
 "Why is this so complicated?"
 The idea is that the Omega runs it's own WIFI network to which you connect in order to control it, rather than requiring an external network route which is.. unusual, but epic :)
 
 ### Connect fresh Omega to the internet to install stuff
 Sod all the web interface stuff, just connect to it's wifi using a laptop with pass:
+
     12345678
+
 Then SSH straight into it:
+
     192.168.3.1
     root
     onioneer
 
 From here we can connect it to a proper house wifi
+
     wifisetup
 
 ### Connect to omega2 via the house wifi
@@ -22,12 +42,14 @@ SSH into Omega-A3BF (or whatever last 4 bold digits on the chip) or actual IP, s
 
 ### Install all the things
 Firstly upgrade the firmware (which wipes everything). WORTH IT though as fast-gpio was knackered in the first few generations.
+
     oupgrade
     opkg update
     opkg install nano
     opkg install nodejs
 
 Check file sizes and whatnot with
+
     df -h
     or better yet,
     opkg install ncdu

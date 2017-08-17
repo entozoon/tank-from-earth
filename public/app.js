@@ -95,24 +95,27 @@ class OrientationalThing {
 //
 // COMPOSITION (better than inheritance)
 //
-const barker = state => {
-  bark: () => console.log(state.motto);
-};
+const speaker = state => ({
+  speak: () => console.log(state.motto)
+});
 
 const orientator = state => {
+  let alpha = 99;
   return {
-    bark: () => console.log('Woof, I am ' + state.name)
+    dwa: () => console.log('Woof, I am ' + state.name)
   };
 };
 
-const interface = () => {
+const robot = motto => {
   let state = {
-    motto: 'hello'
+    motto: motto
   };
-  return Object.assign({}, barker(state), orientator(state));
+  return Object.assign({}, speaker(state), orientator(state));
 };
 
-interface.bark();
+const tank = robot('Go fuck ya sen!');
+
+tank.speak();
 
 openFullScreen = () => {
   var doc = window.document;
