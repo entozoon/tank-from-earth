@@ -100,9 +100,14 @@ const speaker = state => ({
 });
 
 const orientator = state => {
-  let alpha = 99;
+  let orientation = {};
   return {
-    dwa: () => console.log('Woof, I am ' + state.name)
+    setOrientation: data => {
+      orientation.alpha = data.alpha;
+      orientation.beta = data.beta;
+      orientation.gamma = data.gamma;
+    },
+    getOrientation: () => orientation
   };
 };
 
@@ -113,9 +118,25 @@ const robot = motto => {
   return Object.assign({}, speaker(state), orientator(state));
 };
 
-const tank = robot('Go fuck ya sen!');
+const tank = robot('Go fuck ya sen4!');
 
 tank.speak();
+
+window.addEventListener('deviceorientation', event => {
+  if (event.absolute) {
+    alert('Error: This device uses absolute orientation (ref to earth)..');
+    return;
+  }
+  tank.setOrientation(event);
+});
+
+tank.setOrientation({
+  alpha: 1,
+  beta: 2,
+  gamma: 3
+});
+
+console.log(tank.getOrientation());
 
 openFullScreen = () => {
   var doc = window.document;
