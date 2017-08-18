@@ -21,7 +21,7 @@ let readFilePromise = filename => {
 };
 
 // ERGH
-let IN3, IN4, ENB;
+let motors = {};
 
 Promise.all([
   readFilePromise('./public/client.html'),
@@ -67,22 +67,40 @@ Promise.all([
   //    ENB  18 (not all pins are capable of PWM!)
   //
 
-  // ERGHER
-  IN3 = gpio.pin({
-    pin: 0,
-    debugging: true
-  });
-  IN4 = gpio.pin({
-    pin: 1,
-    debugging: true
-  });
-  ENB = gpio.pin({
-    pin: 18,
-    debugging: true
-  });
-  IN3.set(false);
-  IN4.set(false);
-  ENB.set(false);
+  motors = {
+    a: {
+      in1: gpio.pin({
+        pin: 0,
+        debugging: true
+      }),
+      in2: gpio.pin({
+        pin: 1,
+        debugging: true
+      }),
+      enable: gpio.pin({
+        pin: 18,
+        debugging: true
+      })
+    },
+    a: {
+      in1: gpio.pin({
+        pin: 4, // ????
+        debugging: true
+      }),
+      in2: gpio.pin({
+        pin: 5, // ????
+        debugging: true
+      }),
+      enable: gpio.pin({
+        pin: 6, // ????
+        debugging: true
+      })
+    }
+  };
+  motors.a.in1.set(false);
+  motors.a.in2.set(false);
+  motors.b.in1.set(false);
+  motors.b.in2.set(false);
 });
 
 // WebSocket server for sockets
@@ -92,40 +110,48 @@ wss.on('connection', function connection(ws) {
     if (data.message) {
       console.log(data.message);
     }
-    // Yeah... not like this.
-    if (data.motorA) {
-      setMotor('A', data.motorA);
-    }
-    if (data.motorB) {
-      setMotor('B', data.motorA);
-    }
+
+    //
+    //  DO SOME MOTOR READY TESTS
+    //  ONLY RUN THE SHIT IF LIKE, IT'S READY OR WHATEVER
+    //
+    //  OR BETTER YET, ONLY CREATE THIS CONNECTION EVENT WHEN THEY'RE INITIALISED
+    //
+
+    // Let the client do all the calculations; it has the bigger brain.
+    data.motorA && setMotor(motors.a, data.motorA);
+    data.motorB && setMotor(motors.b, data.motorA);
   });
 
   ws.send('Hello from server!');
 });
 
-gpio.tests().then(() => {
-  // This is awful but just cracking on
-  // Maybe do some array of the pin objects,
-  // {
-  //   A: {
-  //      up: IN3,
-  //      down: IN4
-  //      enable: EN1
-  //   }
-  // }
-  // pins[motor].up.setPin(2) ??
-  //
-});
+// gpio.tests().then(() => {
+//   // errrrr
+// });
 
+// -100 -> 100
 const setMotor = (motor, value) => {
-  if (motor == 'A') {
-    IN3.set(true);
-    IN4.set(false);
-    ENB.pwm({
-      // 200 @ 20 is about the min
-      frequency: 200, // hz
-      duty: 25 // increase from 0 -> 100 for speed!
-    });
-  }
+  // if (value > 0) {
+  //   IN3.set(true);
+  //   IN4.set(false);
+  // } else (value < 0) {
+  //   IN3.set(false);
+  //   IN4.set(true);
+  // } else {
+  //   IN3.set(false);
+  //   IN4.set(false);
+  // }
+
+  // Direction
+  motor.a.in1.set(value > 0);
+  motor.a.in2.set(value < 0);
+
+  // Speed
+  let speed = Math.abs(value / 2); // 0 -> 100 (either direction)
+  motor.a.enable.pwm({
+    // 200 @ 20 is about the min
+    frequency: 200, // hz
+    duty: speed // increase from 0 -> 100 for speed!
+  });
 };
