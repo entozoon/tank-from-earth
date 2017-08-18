@@ -1,7 +1,7 @@
 let ready = false,
   splash = document.getElementById('splash'),
   // If this IP is unpredictable, I might send it through from the server - plus it'd be localhost testable then
-  connection = new WebSocket('ws://127.0.0.1:8080');
+  connection = new WebSocket('ws://' + window.location.host + ':8080');
 
 splash.addEventListener('click', () => {
   //openFullScreen();
@@ -10,7 +10,7 @@ splash.addEventListener('click', () => {
 });
 
 connection.onopen = () => {
-  console.log('Connected');
+  console.log('Connected to server');
 
   connection.onerror = error => {
     console.log('Error: ' + error);
@@ -20,7 +20,38 @@ connection.onopen = () => {
     console.log(message.data);
   };
 
-  connection.send('Hello from client!');
+  connection.send(
+    JSON.stringify({
+      message: 'Hello from client'
+    })
+  );
+
+  const tank = robot('Hello from robot instance');
+
+  tank.speak();
+
+  window.addEventListener('deviceorientation', event => {
+    if (event.absolute) {
+      alert('Error: This device uses absolute orientation (ref to earth)..');
+      return;
+    }
+    tank.setOrientation(event);
+  });
+
+  tank.setOrientation({
+    alpha: 1,
+    beta: 2,
+    gamma: 3
+  });
+
+  console.log(tank.getOrientation());
+
+  connection.send(
+    JSON.stringify({
+      motorA: 20,
+      motorB: 20
+    })
+  );
 };
 
 class OrientationalThing {
@@ -117,26 +148,6 @@ const robot = motto => {
   };
   return Object.assign({}, speaker(state), orientator(state));
 };
-
-const tank = robot('Go fuck ya sen4!');
-
-tank.speak();
-
-window.addEventListener('deviceorientation', event => {
-  if (event.absolute) {
-    alert('Error: This device uses absolute orientation (ref to earth)..');
-    return;
-  }
-  tank.setOrientation(event);
-});
-
-tank.setOrientation({
-  alpha: 1,
-  beta: 2,
-  gamma: 3
-});
-
-console.log(tank.getOrientation());
 
 openFullScreen = () => {
   var doc = window.document;
