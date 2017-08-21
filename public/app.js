@@ -30,31 +30,55 @@ connection.onopen = () => {
 
   tank.emit({ message: '[Hello from tank]' });
 
+  // Simple example of how we'll be setting motor speeds:
+  // connection.send(
+  //   JSON.stringify({
+  //     // -100 -> 100
+  //     motors: {
+  //       a: -20,
+  //       b: 20
+  //     }
+  //   })
+  // );
+
+  //
+  // Tilting! Do all the calculations and blast the motor data back over to the robut
+  //
   window.addEventListener('deviceorientation', event => {
     if (event.absolute) {
       alert('Error: This device uses absolute orientation (ref to earth)..');
       return;
     }
     tank.setOrientation(event);
+    console.log(tank.getOrientation());
+    tank.emit({
+      motors: tank.orientationToMotorSpeeds(tank.getOrientation())
+    });
   });
 
-  tank.setOrientation({
-    alpha: 1,
-    beta: 2,
-    gamma: 3
-  });
-
-  console.log(tank.getOrientation());
-
-  connection.send(
-    JSON.stringify({
-      // -100 -> 100
-      motors: {
-        a: -20,
-        b: 20
-      }
-    })
-  );
+  //
+  // Device Orientation Simulation for localhost testing
+  //
+  if (window.location.host == 'localhost') {
+    let orientation = {
+      alpha: 0,
+      beta: -180,
+      gamma: -90
+    };
+    let flopBeta = false,
+      flopGamma = false;
+    setInterval(() => {
+      // Pan up and down
+      flopBeta = orientation.beta >= 180 || orientation.beta <= -180 ? !flopBeta : flopBeta;
+      flopGamma = orientation.gamma >= 90 || orientation.gamma <= -90 ? !flopGamma : flopGamma;
+      orientation.beta += flopBeta ? 10 : -10;
+      orientation.gamma += flopGamma ? 2 : -2;
+      tank.setOrientation(orientation);
+      tank.emit({
+        motors: tank.orientationToMotorSpeeds(tank.getOrientation())
+      });
+    }, 100);
+  }
 };
 
 //
@@ -68,6 +92,68 @@ const emitter = connection => {
   };
 };
 
+const mecha = () => {
+  return {
+    /**
+    * orientationToMotorSpeeds
+    * @input orientation { alpha: [0 -> 360?], beta: [-180 -> 180], gamma: [-90 -> 90] }
+    * @return {a: int, b: int} [-100 -> 100]
+    */
+    orientationToMotorSpeeds: orientation => {
+      console.log(orientation.gamma);
+      // Oh boy this is gonna be complex.
+      // Tilting left/right affects like, the ratio/dir of power output and forward the speed
+      // so..
+      // I guess create a vector from the tiltnesses, then convert that to motor outputs?
+      // Nah. make it so left/right blasts the motors in that dir at full wack
+      // then scale it back depending on tilt?
+      // No.. it's not a car. erm.
+      // Tilting left/right turns it on the spot, then forward/back increases everything in that dir.
+      // Think of it as x and y..
+      // y
+      // |
+      // |
+      // |      o
+      // |
+      // |
+      // |____________x
+      let y = orientation.gamma / 90 * 100,
+        x = orientation.beta / 180 * 100; // -100 -> 100
+
+      let a = 0,
+        b = 0;
+
+      // Convert x, y co-ordinate versions of the tilting into a, b motor impulses
+      a = x;
+      b = -x;
+
+      a += y;
+      b += y;
+      // Constrain [-100 -> 100]
+      a = a > 100 ? 100 : a;
+      b = a > 100 ? 100 : b;
+      a = a < -100 ? -100 : a;
+      b = a < -100 ? -100 : b;
+
+      //
+      // VISUALISATION, BABY. Winamp style.
+      //
+      let point = document.getElementById('graph__point');
+      let motorA = document.getElementById('motorA');
+      let motorB = document.getElementById('motorB');
+      point.style.marginTop = -y + 'px';
+      point.style.marginLeft = x + 'px';
+      motorA.style.marginTop = -a + 'px';
+      motorB.style.marginTop = -b + 'px';
+
+      return {
+        a: Math.round(a),
+        b: Math.round(b)
+      };
+    }
+  };
+};
+
 const orientator = () => {
   let orientation = {};
   return {
@@ -75,13 +161,18 @@ const orientator = () => {
       orientation.alpha = data.alpha;
       orientation.beta = data.beta;
       orientation.gamma = data.gamma;
+
+      document.getElementById('car').style.transform =
+        'rotate(' + -(this.beta + 90) + 'deg) translateZ(0)';
+      document.getElementById('wheel').style.transform =
+        'rotate(' + (this.beta - 90) + 'deg) translateZ(0)';
     },
     getOrientation: () => orientation
   };
 };
 
 const robot = connection => {
-  return Object.assign({}, orientator(), emitter(connection));
+  return Object.assign({}, emitter(connection), orientator(), mecha());
 };
 
 openFullScreen = () => {

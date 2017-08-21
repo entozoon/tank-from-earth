@@ -49,7 +49,7 @@ Promise.all([
       }),
       enable: gpio.pin({
         pin: 18,
-        debugging: false
+        debugging: true
       })
     },
     b: {
@@ -63,7 +63,7 @@ Promise.all([
       }),
       enable: gpio.pin({
         pin: 6, // ????
-        debugging: false
+        debugging: true
       })
     }
   };
@@ -76,11 +76,10 @@ Promise.all([
     manifest = resolutions[1],
     css = resolutions[2],
     js = resolutions[3];
-  // Net server (or http would be fine) to serve the page
+
+  // Create HTTP server (net is a slimline alternative)
   http
     .createServer(function(request, response) {
-      console.log('[User connected]');
-
       switch (request.url) {
         case '/manifest.json':
           response.write(manifest.toString());
@@ -92,6 +91,7 @@ Promise.all([
           response.write(js.toString());
           break;
         default:
+          console.log('[User request]');
           response.writeHead(200, { 'Content-Type': 'text/html' });
           response.write(client.toString());
           break;

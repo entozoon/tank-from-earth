@@ -30,6 +30,43 @@ body, html {
 .content {
   position: relative;
 }
+#motors {
+  padding: 0 30px;
+  margin: 0 20px;
+  display: flex;
+  position: relative;
+  height: 200px;
+  width: 260px;
+}
+#motorA,
+#motorB {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: 50%;
+  background: #aaa;
+}
+#motorA {
+  left: 0;
+}
+#motorB {
+  right: 0;
+}
+#graph {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  background: #eee;
+}
+#graph__point {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #aaa;
+}
 #car {
   position: relative;
   width: 60vw;
