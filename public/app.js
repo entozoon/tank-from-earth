@@ -163,6 +163,17 @@ const mecha = () => {
       document.getElementById('motorB_').innerHTML = b;
       document.getElementById('motorA_').innerHTML = a;
 
+      //
+      // THIS NEEDS TO BE WAAAAAAAAAY more efficient.
+      // The bottleneck is literally just the fast-gpio command.
+      // UPDATE: it's not, it's maybe more stuff.
+      // - Only send the pwm value when possible, not have server calc dir.
+      // - Frameskip, essentially. Find a reasonable max speed for omega2 by measuring how fast pwm() can run, without any console logs. So I guess use a timer (pessimistically).
+      //   Then, I guess, fire up a setInterval sending over the current motor speed
+      // - Try the above with some different spawn commands, exec/execSync probably quicker.
+      //   As from CLI it can run the command basically as fast as imaginable
+      //
+
       return {
         a: Math.round(a),
         b: Math.round(b)

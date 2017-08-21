@@ -63,7 +63,7 @@ Promise.all([
       }),
       enable: gpio.pin({
         pin: 3,
-        debugging: false
+        debugging: true
       })
     }
   };
@@ -123,12 +123,11 @@ wss.on('connection', function connection(ws) {
 
 // -100 -> 100
 const setMotor = (motor, value) => {
-  // Direction
   motor.in1.set(value > 0);
   motor.in2.set(value < 0);
 
   // Speed
-  let speed = Math.abs(value / 2); // 0 -> 100 (either direction)
+  let speed = Math.abs(value); // 0 -> 100 (either direction)
   motor.enable.pwm({
     // 200 @ 20 is about the min
     frequency: 200, // hz
