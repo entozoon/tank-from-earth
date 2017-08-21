@@ -4,7 +4,7 @@ let ready = false,
   connection = new WebSocket('ws://' + window.location.host + ':8080');
 
 splash.addEventListener('click', () => {
-  //openFullScreen();
+  openFullScreen();
   splash.remove();
   ready = true;
 });
@@ -101,6 +101,21 @@ const mecha = () => {
     */
     orientationToMotorSpeeds: orientation => {
       console.log(orientation.gamma);
+
+      // Try and CSS flip to math phone auto-rotation, at least for my phone.
+      if (orientation.gamma > 29) {
+        document.body.className = 'upside-down';
+      } else if (orientation.gamma < -29) {
+        document.body.className = '';
+      }
+
+      document.getElementById('alpha').innerHTML = Math.round(orientation.alpha) + ' &deg;';
+      document.getElementById('beta').innerHTML = Math.round(orientation.beta) + ' &deg;';
+      document.getElementById('gamma').innerHTML = Math.round(orientation.gamma) + ' &deg;';
+      document.getElementById('alpha').style.width = orientation.alpha + 360 + 'px';
+      document.getElementById('beta').style.width = orientation.beta + 360 + 'px';
+      document.getElementById('gamma').style.width = orientation.gamma + 360 + 'px';
+
       // Oh boy this is gonna be complex.
       // Tilting left/right affects like, the ratio/dir of power output and forward the speed
       // so..
@@ -145,6 +160,8 @@ const mecha = () => {
       point.style.marginLeft = x + 'px';
       motorA.style.marginTop = -a + 'px';
       motorB.style.marginTop = -b + 'px';
+      document.getElementById('motorB_').innerHTML = b;
+      document.getElementById('motorA_').innerHTML = a;
 
       return {
         a: Math.round(a),
@@ -162,10 +179,10 @@ const orientator = () => {
       orientation.beta = data.beta;
       orientation.gamma = data.gamma;
 
-      document.getElementById('car').style.transform =
-        'rotate(' + -(this.beta + 90) + 'deg) translateZ(0)';
-      document.getElementById('wheel').style.transform =
-        'rotate(' + (this.beta - 90) + 'deg) translateZ(0)';
+      // document.getElementById('car').style.transform =
+      //   'rotate(' + -(this.beta + 90) + 'deg) translateZ(0)';
+      // document.getElementById('wheel').style.transform =
+      //   'rotate(' + (this.beta - 90) + 'deg) translateZ(0)';
     },
     getOrientation: () => orientation
   };
@@ -218,13 +235,6 @@ openFullScreen = () => {
 //         this.alpha = event.alpha;
 //         this.beta = event.beta;
 //         this.gamma = event.gamma;
-//
-//         document.getElementById('alpha').innerHTML = Math.round(this.alpha) + ' &deg;';
-//         document.getElementById('beta').innerHTML = Math.round(this.beta) + ' &deg;';
-//         document.getElementById('gamma').innerHTML = Math.round(this.gamma) + ' &deg;';
-//         document.getElementById('alpha').style.width = this.alpha + 360 + 'px';
-//         document.getElementById('beta').style.width = this.beta + 360 + 'px';
-//         document.getElementById('gamma').style.width = this.gamma + 360 + 'px';
 //
 //         document.getElementById('needle').style.transform =
 //           'rotate(' + -(this.beta + 90) + 'deg) translateZ(0)';

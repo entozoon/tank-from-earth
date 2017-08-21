@@ -4,7 +4,7 @@
   <link rel="manifest" href="/manifest.json" />
   <link rel="stylesheet" type="text/css" href="/app.css" />
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 </head>
 <body>
 
@@ -13,6 +13,8 @@
 </div>
 
 <main class="content">
+  <div class="half">
+
   <div id="motors">
   <div id="motorA"></div>
     <div id="graph">
@@ -20,34 +22,27 @@
     </div>
     <div id="motorB"></div>
   </div>
+</div>
+<div class="half">
+  <div id="motorA_" class="half"></div>
+  <div id="motorB_" class="half"></div>
+</div>
 
-  re-Enable fullscreen when it's done..
-
+  <!-- re-Enable fullscreen when it's done.. -->
+<!--
   <div id="car">
     <div id="wheel"></div>
-  </div>
+  </div> -->
 
   <table>
     <tr><td>alpha:</td><td><div id="alpha" class="bar"></div></td></tr>
     <tr><td>beta:</td><td><div id="beta" class="bar"></div></td></tr>
     <tr><td>gamma:</td><td><div id="gamma" class="bar"></div></td></tr>
-    <tr><td>a1:</td><td><div id="a1" class="bar"></div></td></tr>
+    <!-- <tr><td>a1:</td><td><div id="a1" class="bar"></div></td></tr>
     <tr><td>a2:</td><td><div id="a2" class="bar"></div></td></tr>
-    <tr><td>ro:</td><td><div id="ro" class="bar"></div></td></tr>
+    <tr><td>ro:</td><td><div id="ro" class="bar"></div></td></tr> -->
   </table>
 
-  <div id="needle"></div>
-
-  <div style="position:relative">
-  <div id="blob1"></div>
-  <div id="blob2"></div>
-  <div id="blob2dx"></div>
-  <div id="blob2dy"></div>
-  </div>
-
-  <div id="tank">
-    <div id="direction"></div>
-  </div>
 </main>
 
 <script type="text/javascript" src="/app.js"></script>

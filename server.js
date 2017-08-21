@@ -30,9 +30,9 @@ Promise.all([
 ]).then(resolutions => {
   //
   // LP298N  Omega
-  //    ENA
-  //    IN1
-  //    IN4
+  //    ENA  3
+  //    IN1  2
+  //    IN4  9
   //    IN3  0
   //    IN4  1
   //    ENB  18 (NB: not all pins are capable of PWM!)
@@ -49,21 +49,21 @@ Promise.all([
       }),
       enable: gpio.pin({
         pin: 18,
-        debugging: true
+        debugging: false
       })
     },
     b: {
       in1: gpio.pin({
-        pin: 4, // ????
+        pin: 2,
         debugging: false
       }),
       in2: gpio.pin({
-        pin: 5, // ????
+        pin: 9,
         debugging: false
       }),
       enable: gpio.pin({
-        pin: 6, // ????
-        debugging: true
+        pin: 3,
+        debugging: false
       })
     }
   };
