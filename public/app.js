@@ -10,7 +10,7 @@ splash.addEventListener('click', () => {
 });
 
 connection.onopen = () => {
-  console.log('Connected to server');
+  console.log('[Connected to server]');
 
   connection.onerror = error => {
     console.log('Error: ' + error);
@@ -22,13 +22,13 @@ connection.onopen = () => {
 
   connection.send(
     JSON.stringify({
-      message: 'Hello from client'
+      message: '[Hello from client]'
     })
   );
 
-  const tank = robot('Hello from robot instance');
+  const tank = robot(connection);
 
-  tank.speak();
+  tank.emit({ message: '[Hello from tank]' });
 
   window.addEventListener('deviceorientation', event => {
     if (event.absolute) {
@@ -49,20 +49,26 @@ connection.onopen = () => {
   connection.send(
     JSON.stringify({
       // -100 -> 100
-      motorA: -20,
-      motorB: 20
+      motors: {
+        a: -20,
+        b: 20
+      }
     })
   );
 };
 
 //
-// COMPOSITION (better than inheritance)
+// COMPOSITION (better than inheritance, bitches!)
 //
-const speaker = state => ({
-  speak: () => console.log(state.motto)
-});
+const emitter = connection => {
+  return {
+    emit: message => {
+      connection.send(JSON.stringify(message));
+    }
+  };
+};
 
-const orientator = state => {
+const orientator = () => {
   let orientation = {};
   return {
     setOrientation: data => {
@@ -74,11 +80,8 @@ const orientator = state => {
   };
 };
 
-const robot = motto => {
-  let state = {
-    motto: motto
-  };
-  return Object.assign({}, speaker(state), orientator(state));
+const robot = connection => {
+  return Object.assign({}, orientator(), emitter(connection));
 };
 
 openFullScreen = () => {
