@@ -114,8 +114,11 @@ wss.on('connection', function connection(ws) {
     if (!data.motors) return;
 
     // Let the client do all the calculations; it has the bigger brain.
-    setMotor(motors.a, data.motors.a);
-    setMotor(motors.b, data.motors.b);
+    // setMotor(motors.a, data.motors.a);
+    // setMotor(motors.b, data.motors.b);
+    // .. Moreso
+    setMotorManual(motors.a, data.motors.a);
+    setMotorManual(motors.b, data.motors.b);
   });
 
   ws.send('[Hello from server]');
@@ -132,5 +135,35 @@ const setMotor = (motor, value) => {
     // 200 @ 20 is about the min
     frequency: 200, // hz
     duty: speed // increase from 0 -> 100 for speed!
+  });
+};
+
+// {
+//   speed: [0, 100]
+//   matrix: e.g. [0, 1]
+// }
+const setMotorManual = (motor, values) => {
+  // Insane laziness here. Not too efficient either,
+  // but brapping it in because my theory is that
+  // global trash like this is quicker than spawns.
+  if (values.matrix[0] != motor.PASSTHESESOMEWHERE) {
+    motor.PASSTHESESOMEWHERE = values.matrix[0];
+    console.log('Dir change');
+    motor.in1.set(values.matrix[0]);
+  }
+
+  if (values.matrix[1] != motorDirB) {
+    motorDirB = values.matrix[1];
+    console.log('Dir change');
+    motor.in2.set(values.matrix[1]);
+  }
+
+  //console.log(values);
+
+  // Speed
+  motor.enable.pwm({
+    // 200 @ 20 is about the min
+    frequency: 200, // hz
+    duty: values.speed // increase from 0 -> 100 for speed!
   });
 };

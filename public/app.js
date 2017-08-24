@@ -50,14 +50,11 @@ connection.onopen = () => {
       return;
     }
     tank.setOrientation(event);
-    console.log(tank.getOrientation());
-    tank.emit({
-      motors: tank.orientationToMotorSpeeds(tank.getOrientation())
-    });
+    tank.orientationToMotorSpeeds(tank.getOrientation());
   });
 
   //
-  // Device Orientation Simulation for localhost testing
+  // Device Orientation SIMULATION for localhost testing
   //
   if (window.location.host == 'localhost') {
     let orientation = {
@@ -74,10 +71,43 @@ connection.onopen = () => {
       orientation.beta += flopBeta ? 10 : -10;
       orientation.gamma += flopGamma ? 2 : -2;
       tank.setOrientation(orientation);
+      tank.orientationToMotorSpeeds(tank.getOrientation());
+    }, 50); // fast simulated events
+
+    //
+    // EMIT INTERVAL
+    // Only emit the event occasionally, as Omega can't keep up
+    //
+    let emitMotorsInterval = setInterval(() => {
+      console.log(tank.getMotorSpeeds());
+      // Don't stress about the processing here, compared to server.
+      // Super manual timez
+      let motorSpeeds = tank.getMotorSpeeds(); // { a: 1, b: 2 }
+      let motorEmits = {
+        a: {
+          speed: Math.abs(motorSpeeds.a),
+          matrix: [motorSpeeds.a > 0, motorSpeeds.a < 0]
+        },
+        b: {
+          speed: Math.abs(motorSpeeds.b),
+          matrix: [motorSpeeds.b > 0, motorSpeeds.b < 0]
+        }
+      };
       tank.emit({
-        motors: tank.orientationToMotorSpeeds(tank.getOrientation())
+        motors: motorEmits
       });
-    }, 100);
+    }, 250);
+
+    //
+    // THIS NEEDS TO BE WAAAAAAAAAY more efficient.
+    // The bottleneck is literally just the fast-gpio command.
+    // UPDATE: it's not, it's maybe more stuff.
+    // - Only send the pwm value when possible, not have server calc dir.
+    // - Frameskip, essentially. Find a reasonable max speed for omega2 by measuring how fast pwm() can run, without any console logs. So I guess use a timer (pessimistically).
+    //   Then, I guess, fire up a setInterval sending over the current motor speed
+    // - Try the above with some different spawn commands, exec/execSync probably quicker.
+    //   As from CLI it can run the command basically as fast as imaginable
+    //
   }
 };
 
@@ -93,14 +123,18 @@ const emitter = connection => {
 };
 
 const mecha = () => {
+  let motorSpeeds = {};
   return {
+    getMotorSpeeds: () => {
+      return this.motorSpeeds;
+    },
     /**
     * orientationToMotorSpeeds
     * @input orientation { alpha: [0 -> 360?], beta: [-180 -> 180], gamma: [-90 -> 90] }
     * @return {a: int, b: int} [-100 -> 100]
     */
     orientationToMotorSpeeds: orientation => {
-      console.log(orientation.gamma);
+      //console.log(orientation.gamma);
 
       // Try and CSS flip to math phone auto-rotation, at least for my phone.
       if (orientation.gamma > 29) {
@@ -146,9 +180,9 @@ const mecha = () => {
       b += y;
       // Constrain [-100 -> 100]
       a = a > 100 ? 100 : a;
-      b = a > 100 ? 100 : b;
+      b = b > 100 ? 100 : b;
       a = a < -100 ? -100 : a;
-      b = a < -100 ? -100 : b;
+      b = b < -100 ? -100 : b;
 
       //
       // VISUALISATION, BABY. Winamp style.
@@ -163,18 +197,7 @@ const mecha = () => {
       document.getElementById('motorB_').innerHTML = b;
       document.getElementById('motorA_').innerHTML = a;
 
-      //
-      // THIS NEEDS TO BE WAAAAAAAAAY more efficient.
-      // The bottleneck is literally just the fast-gpio command.
-      // UPDATE: it's not, it's maybe more stuff.
-      // - Only send the pwm value when possible, not have server calc dir.
-      // - Frameskip, essentially. Find a reasonable max speed for omega2 by measuring how fast pwm() can run, without any console logs. So I guess use a timer (pessimistically).
-      //   Then, I guess, fire up a setInterval sending over the current motor speed
-      // - Try the above with some different spawn commands, exec/execSync probably quicker.
-      //   As from CLI it can run the command basically as fast as imaginable
-      //
-
-      return {
+      this.motorSpeeds = {
         a: Math.round(a),
         b: Math.round(b)
       };
