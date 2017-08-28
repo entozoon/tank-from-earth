@@ -1,7 +1,17 @@
+let socketUrl = 'localhost';
+if (window.location.host) {
+  socketUrl = window.location.host;
+}
 let ready = false,
   splash = document.getElementById('splash'),
   // If this IP is unpredictable, I might send it through from the server - plus it'd be localhost testable then
-  connection = new WebSocket('ws://' + window.location.host + ':8080');
+  connection = new WebSocket('ws://' + socketUrl + ':8080'),
+  emitMotorsFlip = false;
+
+window.addEventListener('orientationchange', () => {
+  alert(window.orientation);
+  alert('use this instead of the gamma for CSS flip. set body class');
+});
 
 splash.addEventListener('click', () => {
   openFullScreen();
@@ -56,7 +66,7 @@ connection.onopen = () => {
   //
   // Device Orientation SIMULATION for localhost testing
   //
-  if (window.location.host == 'localhost') {
+  if (socketUrl == 'localhost') {
     let orientation = {
       alpha: 0,
       beta: -180,
@@ -83,16 +93,24 @@ connection.onopen = () => {
       // Don't stress about the processing here, compared to server.
       // Super manual timez
       let motorSpeeds = tank.getMotorSpeeds(); // { a: 1, b: 2 }
-      let motorEmits = {
-        a: {
-          speed: Math.abs(motorSpeeds.a),
-          matrix: [motorSpeeds.a > 0, motorSpeeds.a < 0]
-        },
-        b: {
-          speed: Math.abs(motorSpeeds.b),
-          matrix: [motorSpeeds.b > 0, motorSpeeds.b < 0]
-        }
-      };
+      emitMotorsFlip = !emitMotorsFlip;
+      // A or B, keep alternating to spread out the motor operations
+      let motorEmits = {};
+      if (emitMotorsFlip) {
+        motorEmits = {
+          a: {
+            speed: Math.abs(motorSpeeds.a),
+            matrix: [motorSpeeds.a > 0, motorSpeeds.a < 0]
+          }
+        };
+      } else {
+        motorEmits = {
+          b: {
+            speed: Math.abs(motorSpeeds.b),
+            matrix: [motorSpeeds.b > 0, motorSpeeds.b < 0]
+          }
+        };
+      }
       tank.emit({
         motors: motorEmits
       });

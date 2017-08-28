@@ -41,30 +41,32 @@ Promise.all([
     a: {
       in1: gpio.pin({
         pin: 0,
-        debugging: false
+        debugging: true
       }),
       in2: gpio.pin({
         pin: 1,
-        debugging: false
+        debugging: true
       }),
       enable: gpio.pin({
         pin: 18,
-        debugging: false
-      })
+        debugging: true
+      }),
+      matrix: [999, 999]
     },
     b: {
       in1: gpio.pin({
         pin: 2,
-        debugging: false
+        debugging: true
       }),
       in2: gpio.pin({
         pin: 9,
-        debugging: false
+        debugging: true
       }),
       enable: gpio.pin({
         pin: 3,
         debugging: true
-      })
+      }),
+      matrix: [999, 999]
     }
   };
   motors.a.in1.set(false);
@@ -117,8 +119,13 @@ wss.on('connection', function connection(ws) {
     // setMotor(motors.a, data.motors.a);
     // setMotor(motors.b, data.motors.b);
     // .. Moreso
-    setMotorManual(motors.a, data.motors.a);
-    setMotorManual(motors.b, data.motors.b);
+    if (data.motors.a) {
+      setMotorManual(motors.a, data.motors.a);
+      motors.a.matrix = data.motors.a.matrix;
+    } else if (data.motors.b) {
+      setMotorManual(motors.b, data.motors.b);
+      motors.b.matrix = data.motors.b.matrix;
+    }
   });
 
   ws.send('[Hello from server]');
@@ -142,18 +149,21 @@ const setMotor = (motor, value) => {
 //   speed: [0, 100]
 //   matrix: e.g. [0, 1]
 // }
+//  Don't judge me:
+// let motorDirA = 999,
+// motorDirB = 999;
 const setMotorManual = (motor, values) => {
   // Insane laziness here. Not too efficient either,
   // but brapping it in because my theory is that
   // global trash like this is quicker than spawns.
-  if (values.matrix[0] != motor.PASSTHESESOMEWHERE) {
-    motor.PASSTHESESOMEWHERE = values.matrix[0];
+  if (values.matrix[0] !== motor.matrix[0]) {
+    motor.matrix[0] = values.matrix[0];
     console.log('Dir change');
     motor.in1.set(values.matrix[0]);
   }
 
-  if (values.matrix[1] != motorDirB) {
-    motorDirB = values.matrix[1];
+  if (values.matrix[1] !== motor.matrix[1]) {
+    motor.matrix[1] = values.matrix[1];
     console.log('Dir change');
     motor.in2.set(values.matrix[1]);
   }
