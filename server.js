@@ -31,40 +31,40 @@ Promise.all([
   //
   // LP298N  Omega
   //    ENA  3
-  //    IN1  2
-  //    IN4  9
-  //    IN3  0
-  //    IN4  1
+  //    IN1  6
+  //    IN2  19
+  //    IN3  1
+  //    IN4  0
   //    ENB  18 (NB: not all pins are capable of PWM!)
   //
   motors = {
     a: {
       in1: gpio.pin({
-        pin: 0,
-        debugging: true
-      }),
-      in2: gpio.pin({
         pin: 1,
         debugging: true
       }),
+      in2: gpio.pin({
+        pin: 0,
+        debugging: false
+      }),
       enable: gpio.pin({
         pin: 18,
-        debugging: true
+        debugging: false
       }),
       matrix: [999, 999]
     },
     b: {
       in1: gpio.pin({
-        pin: 2,
+        pin: 6,
         debugging: true
       }),
       in2: gpio.pin({
-        pin: 9,
-        debugging: true
+        pin: 19,
+        debugging: false
       }),
       enable: gpio.pin({
         pin: 3,
-        debugging: true
+        debugging: false
       }),
       matrix: [999, 999]
     }
@@ -158,13 +158,13 @@ const setMotorManual = (motor, values) => {
   // global trash like this is quicker than spawns.
   if (values.matrix[0] !== motor.matrix[0]) {
     motor.matrix[0] = values.matrix[0];
-    console.log('Dir change');
+    //console.log('Dir change');
     motor.in1.set(values.matrix[0]);
   }
 
   if (values.matrix[1] !== motor.matrix[1]) {
     motor.matrix[1] = values.matrix[1];
-    console.log('Dir change');
+    //console.log('Dir change');
     motor.in2.set(values.matrix[1]);
   }
 

@@ -9,8 +9,9 @@ let ready = false,
   emitMotorsFlip = false;
 
 window.addEventListener('orientationchange', () => {
-  alert(window.orientation);
-  alert('use this instead of the gamma for CSS flip. set body class');
+  // alert(window.orientation);
+  // alert('use this instead of the gamma for CSS flip. set body class');
+  document.body.className = window.orientation == -90 ? 'upside-down' : '';
 });
 
 splash.addEventListener('click', () => {
@@ -65,68 +66,76 @@ connection.onopen = () => {
 
   //
   // Device Orientation SIMULATION for localhost testing
-  //
+  // TESTING MYKE DELETE BLERRRGGHH YOU FOOL
   if (socketUrl == 'localhost') {
+    // || 1 == 1) {
     let orientation = {
       alpha: 0,
       beta: -180,
       gamma: -90
     };
     let flopBeta = false,
-      flopGamma = false;
+      flopGamma = false,
+      counter = 0;
     setInterval(() => {
       // Pan up and down
-      flopBeta = orientation.beta >= 180 || orientation.beta <= -180 ? !flopBeta : flopBeta;
-      flopGamma = orientation.gamma >= 90 || orientation.gamma <= -90 ? !flopGamma : flopGamma;
-      orientation.beta += flopBeta ? 10 : -10;
-      orientation.gamma += flopGamma ? 2 : -2;
+      // flopBeta = orientation.beta >= 180 || orientation.beta <= -180 ? !flopBeta : flopBeta;
+      // flopGamma = orientation.gamma >= 90 || orientation.gamma <= -90 ? !flopGamma : flopGamma;
+      // orientation.beta += flopBeta ? 10 : -10;
+      // orientation.gamma += flopGamma ? 2 : -2;
+      //orientation.beta = Math.sin(counter / 100) * 180;
+      orientation.gamma = Math.sin(counter / 100) * 90;
+      orientation.beta = 0;
+      // What the hecccck
+
       tank.setOrientation(orientation);
       tank.orientationToMotorSpeeds(tank.getOrientation());
+      counter++;
     }, 50); // fast simulated events
-
-    //
-    // EMIT INTERVAL
-    // Only emit the event occasionally, as Omega can't keep up
-    //
-    let emitMotorsInterval = setInterval(() => {
-      console.log(tank.getMotorSpeeds());
-      // Don't stress about the processing here, compared to server.
-      // Super manual timez
-      let motorSpeeds = tank.getMotorSpeeds(); // { a: 1, b: 2 }
-      emitMotorsFlip = !emitMotorsFlip;
-      // A or B, keep alternating to spread out the motor operations
-      let motorEmits = {};
-      if (emitMotorsFlip) {
-        motorEmits = {
-          a: {
-            speed: Math.abs(motorSpeeds.a),
-            matrix: [motorSpeeds.a > 0, motorSpeeds.a < 0]
-          }
-        };
-      } else {
-        motorEmits = {
-          b: {
-            speed: Math.abs(motorSpeeds.b),
-            matrix: [motorSpeeds.b > 0, motorSpeeds.b < 0]
-          }
-        };
-      }
-      tank.emit({
-        motors: motorEmits
-      });
-    }, 250);
-
-    //
-    // THIS NEEDS TO BE WAAAAAAAAAY more efficient.
-    // The bottleneck is literally just the fast-gpio command.
-    // UPDATE: it's not, it's maybe more stuff.
-    // - Only send the pwm value when possible, not have server calc dir.
-    // - Frameskip, essentially. Find a reasonable max speed for omega2 by measuring how fast pwm() can run, without any console logs. So I guess use a timer (pessimistically).
-    //   Then, I guess, fire up a setInterval sending over the current motor speed
-    // - Try the above with some different spawn commands, exec/execSync probably quicker.
-    //   As from CLI it can run the command basically as fast as imaginable
-    //
   }
+
+  //
+  // EMIT INTERVAL
+  // Only emit the event occasionally, as Omega can't keep up
+  //
+  let emitMotorsInterval = setInterval(() => {
+    console.log(tank.getMotorSpeeds());
+    // Don't stress about the processing here, compared to server.
+    // Super manual timez
+    let motorSpeeds = tank.getMotorSpeeds(); // { a: 1, b: 2 }
+    emitMotorsFlip = !emitMotorsFlip;
+    // A or B, keep alternating to spread out the motor operations
+    let motorEmits = {};
+    if (emitMotorsFlip) {
+      motorEmits = {
+        a: {
+          speed: Math.abs(motorSpeeds.a),
+          matrix: [motorSpeeds.a > 0, motorSpeeds.a < 0]
+        }
+      };
+    } else {
+      motorEmits = {
+        b: {
+          speed: Math.abs(motorSpeeds.b),
+          matrix: [motorSpeeds.b > 0, motorSpeeds.b < 0]
+        }
+      };
+    }
+    tank.emit({
+      motors: motorEmits
+    });
+  }, 250);
+
+  //
+  // THIS NEEDS TO BE WAAAAAAAAAY more efficient.
+  // The bottleneck is literally just the fast-gpio command.
+  // UPDATE: it's not, it's maybe more stuff.
+  // - Only send the pwm value when possible, not have server calc dir.
+  // - Frameskip, essentially. Find a reasonable max speed for omega2 by measuring how fast pwm() can run, without any console logs. So I guess use a timer (pessimistically).
+  //   Then, I guess, fire up a setInterval sending over the current motor speed
+  // - Try the above with some different spawn commands, exec/execSync probably quicker.
+  //   As from CLI it can run the command basically as fast as imaginable
+  //
 };
 
 //
@@ -155,11 +164,11 @@ const mecha = () => {
       //console.log(orientation.gamma);
 
       // Try and CSS flip to math phone auto-rotation, at least for my phone.
-      if (orientation.gamma > 29) {
-        document.body.className = 'upside-down';
-      } else if (orientation.gamma < -29) {
-        document.body.className = '';
-      }
+      // if (orientation.gamma > 29) {
+      //   document.body.className = 'upside-down';
+      // } else if (orientation.gamma < -29) {
+      //   document.body.className = '';
+      // }
 
       document.getElementById('alpha').innerHTML = Math.round(orientation.alpha) + ' &deg;';
       document.getElementById('beta').innerHTML = Math.round(orientation.beta) + ' &deg;';

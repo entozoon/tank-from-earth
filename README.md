@@ -2,6 +2,34 @@
 
 Tank controlled by mobile device orientation via its own WIFI AP node server running on an Onion Omega2.
 
+# Status: GIVEN UP
+
+I was soooo close!
+
+Had the whole phone interface going, sending frameskipped motor commands to the robot, but it physically isn't working right - motors going in the wrong directions and such.
+
+## Why?
+
+Could be a few things, here are my (potental) theories for my future self when I forget why I gave up and want to carry on debugging:
+
+- Omega2 can't flip digital outputs reliably enough with fast-gpio (or the omega2-gpio library I made isn't as good as I thought)
+- Omega2 can't keep up with the motor commands spawned by node, even at intervals (though it does set the directional matrix values without interval which, could have been an oversight..)
+- L298N is shit. I should have googled before buying because people recommend against it, plus it gets crazy hot.
+- Motors on my tank are knackered. That's not _the_ issue but it is annoying enough to soften my passions for the project.
+
+## Conclusions
+
+Omega2 is good enough to run a super slimline node server, only just but it does it. And mad power efficient too, I literally had it running for days on 6000mah, running motors on and off too. Nonetheless I'd probably try a Pi next for that slight speed advantage, as I had to optimise it like cray to place 99% of the processing overhead on the client.
+
+
+
+
+
+
+
+
+
+
 # Dev Locally
 Install these packages globally (_not_ into node_modules) so they don't FTP themselves to the device.
     npm i -g browser-sync opn-cli
