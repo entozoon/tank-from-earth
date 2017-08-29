@@ -1,6 +1,8 @@
 # Tank From Earth
 
-Tank controlled by mobile device orientation via its own WIFI AP node server running on an Onion Omega2.
+Tank controlled by mobile device orientation via its own WIFI AP (no way! yes way!) node server running on an Onion Omega2.
+
+![Not as fire-hazardy as it looks](http://i.imgur.com/DnAEnKX.jpg)
 
 # Status: GIVEN UP
 
@@ -19,11 +21,9 @@ Could be a few things, here are my (potental) theories for my future self when I
 
 ## Conclusions
 
-Omega2 is good enough to run a super slimline node server, only just but it does it. And mad power efficient too, I literally had it running for days on 6000mah, running motors on and off too. Nonetheless I'd probably try a Pi next for that slight speed advantage, as I had to optimise it like cray to place 99% of the processing overhead on the client.
+Omega2 is good enough to run a super slimline node server, only just but it does it - on it's own AP wifi network! Something that's pretty hard to achieve on similar things like ESP8266, or super tough on a Pi.
 
-
-
-
+And it's mad power efficient too, I literally had it running for days on 6000mah, running motors on and off too. Nonetheless I'd probably try a Pi next for that slight speed advantage (if AP mode is possible though I haven't managed it yet), as I had to optimise it like cray to place 99% of the processing overhead on the client.
 
 
 
